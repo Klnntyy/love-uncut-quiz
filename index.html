@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love Uncut Quiz</title>
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(to right, #ffd6ec, #d0f0ff);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+    .screen {
+      display: none;
+    }
+    .active {
+      display: block;
+    }
+    .question-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
+    }
+    button {
+      background: #ff6f91;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #ff3d6a;
+    }
+    .result-img {
+      width: 200px;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    .options label {
+      display: block;
+      margin: 1rem 0;
+      cursor: pointer;
+    }
+    h1, h2 {
+      color: #ff4081;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="start" class="screen active">
+      <h1>คุณเป็นใครใน Love Uncut?</h1>
+      <p>ตอบคำถาม 10 ข้อ แล้วมาดูกันว่าคุณมีบุคลิกเหมือนใครใน Love Uncut!</p>
+      <button onclick="startQuiz()">เริ่มเล่น</button>
+    </div>
+
+    <div id="quiz" class="screen">
+      <div id="questionContainer" class="question-box"></div>
+      <button onclick="nextQuestion()">ถัดไป</button>
+    </div>
+
+    <div id="result" class="screen">
+      <div class="question-box" id="resultContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      ["เวลาทำงานกลุ่ม คุณชอบทำหน้าที่แบบไหน?", [
+        ["วางแผนงาน ควบคุมจังหวะ และคุยกับทุกฝ่ายให้เข้าใจตรงกัน", "เจนรบ"],
+        ["สร้างบรรยากาศให้ทีมสดใส มีพลังอยู่เสมอ", "อลัน"],
+        ["เป็นคนคิดลึก มีมุมมองสร้างสรรค์ และชอบงานที่มีความหมาย", "ก้องภพ"],
+        ["มีบทบาทเด่น อยากให้ผลงานเป็นที่จดจำ", "เฟรม"],
+        ["ทำงานเงียบ ๆ คนเดียว แต่ใส่ใจเต็มที่", "ธัน"],
+        ["ถ้ามีปัญหา ก็พร้อมชน พร้อมแสดงความไม่พอใจชัดเจน", "โอม"]
+      ]],
+      ["ถ้ารู้ว่ามีคนในทีมไม่ชอบคุณ คุณจะ...?", [
+        ["ยังพยายามเป็นมิตร เพราะไม่อยากให้บรรยากาศแย่", "มาร์ช"],
+        ["ทำเป็นไม่รู้ไม่ชี้ แต่ลึก ๆ ก็แอบคิดมาก", "เฟรม"],
+        ["ไม่ใส่ใจ เพราะคุณมั่นใจในตัวเองและผลงาน", "เซฟ"],
+        ["พยายามหาทางพูดคุยและเคลียร์ให้เข้าใจ", "นิว"],
+        ["ถ้าเขาไม่ชอบก็เรื่องของเขา ขอแสดงศักยภาพให้เต็มที่ดีกว่า", "โอม"]
+      ]],
+      ["สิ่งที่คุณให้ความสำคัญที่สุดเวลาทำงานเป็นทีมคือ...?", [
+        ["ความจริงใจและมิตรภาพ", "เป้"],
+        ["คุณภาพของผลงาน และความรับผิดชอบ", "เจนรบ"],
+        ["ความคิดสร้างสรรค์ และความเป็นอิสระ", "ก้องภพ"],
+        ["บรรยากาศสนุก ๆ และการอยู่ร่วมกันอย่างราบรื่น", "อลัน"],
+        ["โอกาสในการพิสูจน์ตัวเอง", "ธัน"]
+      ]],
+      ["ถ้าเพื่อนในทีมทำงานผิดพลาด คุณจะ...?", [
+        ["เข้าใจและให้โอกาส เพราะทุกคนมีพลาดได้", "เป้"],
+        ["ถ้าเขาตั้งใจก็พร้อมช่วย แต่ถ้าไม่พยายาม ก็ไม่โอเค", "มาร์ช"],
+        ["แสดงออกชัดเจนว่าไม่พอใจ เพราะมันกระทบทั้งทีม", "โอม"],
+        ["พูดหยอก ๆ ให้เขารู้ตัวแบบไม่แรงเกินไป", "เฟรม"],
+        ["ถอยออกมาเงียบ ๆ แล้วทำในส่วนของตัวเองต่อ", "อลัน"]
+      ]],
+      ["เมื่อถูกประเมินต่ำกว่าความสามารถ คุณจะ...?", [
+        ["ไม่พูดเยอะ แต่จะทำให้เห็นผ่านผลงาน", "เซฟ"],
+        ["เก็บไว้ในใจ และใช้เป็นแรงผลักดัน", "ธัน"],
+        ["ลุกขึ้นพิสูจน์ตัวเองอย่างเต็มที่", "นิว"],
+        ["เสียใจบ้าง แต่จะยังไม่หยุดพยายาม", "เป้"],
+        ["ไม่ยอมแน่ พร้อมตอบโต้ทันที", "โอม"]
+      ]],
+      ["ถ้าทีมเงียบและเครียด คุณมักจะ...?", [
+        ["ช่วยทำให้บรรยากาศผ่อนคลาย ด้วยมุกเล็ก ๆ หรือรอยยิ้ม", "เฟรม"],
+        ["สังเกตสถานการณ์ก่อน แล้วค่อยหาทางออกอย่างใจเย็น", "ก้องหล้า"],
+        ["ลุยเข้าไปพูดตรง ๆ เพื่อให้ทุกคนเข้าใจกัน", "เจนรบ"],
+        ["รู้สึกอึดอัด แต่พยายามไม่แสดงออก", "ธัน"]
+      ]],
+      ["สไตล์การทำงานของคุณเป็นแบบไหน?", [
+        ["ใส่ใจในรายละเอียดรอบด้าน", "เจนรบ"],
+        ["มีพลังบวก และรู้หน้าที่ของตัวเองชัดเจน", "อลัน"],
+        ["ทำงานตามอารมณ์ ถ้าอินก็ลุยสุดตัว", "เฟรม"],
+        ["เงียบ ๆ แต่จริงจัง และมีประสิทธิภาพ", "เซฟ"],
+        ["ทำเร็ว แรง ตรงไปตรงมา", "โอม"]
+      ]],
+      ["คุณรับมือกับ \"ความพ่ายแพ้\" อย่างไร?", [
+        ["เจ็บอยู่บ้าง แต่จะไม่ยอมแพ้ง่าย ๆ", "นิว"],
+        ["ยอมรับ และเรียนรู้เพื่อไม่ให้พลาดอีก", "ก้องภพ"],
+        ["ปล่อยผ่าน เพราะชีวิตยังมีเรื่องให้เรียนรู้อีกเยอะ", "อลัน"],
+        ["ไม่ยอมแน่นอน ต้องมีโอกาสแก้ตัว", "โอม"]
+      ]],
+      ["ถ้ามีคนแสดงความชอบคุณ คุณจะ...?", [
+        ["ทำเป็นไม่รู้ แต่ในใจคือเขินมาก", "เฟรม"],
+        ["หยอดกลับแบบขำ ๆ เพื่อดูท่าที", "มาร์ช"],
+        ["เปิดใจถ้าคนคนนั้นยอมรับในตัวตนของคุณ", "นิว"],
+        ["มั่นใจในตัวเองอยู่แล้ว ถ้าเขาชอบก็ดีเลย", "เซฟ"],
+        ["ระวังไว้ก่อน เพราะกลัวถูกหลอกใช้", "โอม"]
+      ]],
+      ["ถ้าให้คุณอธิบายตัวเองในกลุ่มด้วยคำเดียว จะเลือก...?", [
+        ["นักสู้", "เจนรบ"],
+        ["นักเยียวยา", "มาร์ช"],
+        ["นักสร้างสรรค์", "ก้องภพ"],
+        ["นักบันเทิง", "เฟรม"],
+        ["นักลุย", "โอม"],
+        ["นักประสานใจ", "นิว"]
+      ]]
+    ];
+
+    const descriptions = {
+      "เจนรบ": ["https://via.placeholder.com/200?text=เจนรบ", "คุณเป็นผู้นำที่มุ่งมั่น วางแผนเก่ง และพร้อมเคลียร์ทุกเรื่องเพื่อทีมสำเร็จ"],
+      "อลัน": ["https://via.placeholder.com/200?text=อลัน", "คุณคือคนสร้างพลังบวก เป็นสายฮีลทีม และทำให้ทุกคนหัวเราะได้เสมอ"],
+      "ก้องภพ": ["https://via.placeholder.com/200?text=ก้องภพ", "คุณคือคนลึกซึ้ง ศิลปินสายเงียบที่มองเห็นสิ่งที่คนอื่นมองไม่เห็น"],
+      "เฟรม": ["https://via.placeholder.com/200?text=เฟรม", "คุณมีสไตล์เด่น เป็นตัวของตัวเอง และกล้าสื่อสารอย่างสร้างสรรค์"],
+      "ธัน": ["https://via.placeholder.com/200?text=ธัน", "คุณคือตัวจริงเสียงจริง เงียบแต่ทำได้ทุกอย่างเกินคาด"],
+      "เซฟ": ["https://via.placeholder.com/200?text=เซฟ", "คุณจริงจัง มีวินัย ไม่พูดมากแต่ทำงานเป๊ะ!"],
+      "โอม": ["https://via.placeholder.com/200?text=โอม", "คุณคือนักสู้ตัวจริง พร้อมชนทุกสถานการณ์ด้วยความมั่นใจ"],
+      "นิว": ["https://via.placeholder.com/200?text=นิว", "คุณคือสะพานเชื่อมใจทุกคน ใจเย็น เข้าใจง่าย และมีเสน่ห์แบบนุ่มลึก"],
+      "เป้": ["https://via.placeholder.com/200?text=เป้", "คุณอบอุ่น ใจดี ยืดหยุ่นและน่าไว้ใจสุด ๆ"],
+      "มาร์ช": ["https://via.placeholder.com/200?text=มาร์ช", "คุณสายเงียบแต่มีพลัง พึ่งพาได้ และพร้อมช่วยเสมอ"]
+    };
+
+    let current = 0;
+    const count = {};
+
+    function startQuiz() {
+      document.getElementById('start').classList.remove('active');
+      document.getElementById('quiz').classList.add('active');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = questions[current];
+      const box = document.getElementById('questionContainer');
+      box.innerHTML = `<h2>ข้อ ${current + 1}</h2><p>${q[0]}</p>`;
+      const opts = q[1].map(([txt, name]) => `<label><input type="radio" name="q${current}" value="${name}"> ${txt}</label>`).join('');
+      box.innerHTML += `<div class="options">${opts}</div>`;
+    }
+
+    function nextQuestion() {
+      const selected = document.querySelector(`input[name="q${current}"]:checked`);
+      if (!selected) return alert('เลือกคำตอบก่อนน้า');
+      const key = selected.value;
+      count[key] = (count[key] || 0) + 1;
+      current++;
+      if (current < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('quiz').classList.remove('active');
+      document.getElementById('result').classList.add('active');
+      const top = Object.entries(count).sort((a,b) => b[1]-a[1])[0];
+      const [name, score] = top;
+      const [img, desc] = descriptions[name];
+      document.getElementById('resultContainer').innerHTML = `
+        <h2>คุณคือ <span style="color:#ff4081">${name}</span></h2>
+        <img class="result-img" src="${img}" alt="${name}">
+        <p>${desc}</p>
+        <button onclick="location.reload()">เล่นใหม่</button>
+      `;
+    }
+  </script>
+</body>
+</html>
